@@ -2,14 +2,14 @@
 
 from fastapi import APIRouter
 
-# from datetime import datetime
-#
-# from fastapi import Depends
-# from sqlmodel.ext.asyncio.session import AsyncSession
-#
-# from app.database import get_session
-# from app.db.learners import read_learners, create_learner
-# from app.models.learner import Learner, LearnerCreate
+from datetime import datetime
+
+from fastapi import Depends
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from app.database import get_session
+from app.db.learners import read_learners, create_learner
+from app.models.learner import Learner, LearnerCreate
 
 router = APIRouter()
 
@@ -19,14 +19,14 @@ router = APIRouter()
 
 # UNCOMMENT AND FILL IN
 #
-# @router.<method>("/<resource_name>", response_model=list[<resource_schema>])
-# async def <function_name>(
-#     <query_param>: <type> = None,
-#     session: AsyncSession = Depends(get_session),
-# ):
-#     """<docstring>"""
-#     return await <db_read_function>(session, <query_param>)
-#
+@router.get("/learners", response_model=list[Learner])
+async def read_learners_route(
+     enrolled_after: datetime | None = None,
+     session: AsyncSession = Depends(get_session),
+):
+    """Read all learners from the database, optionally filtered by enrollment date."""
+     return await read_learners(session, enrolled_after)
+
 # Reference:
 # items GET -> reads from items table, returns list[Item]
 # learners GET -> reads from learners table, returns list[Learner]
@@ -38,13 +38,13 @@ router = APIRouter()
 
 # UNCOMMENT AND FILL IN
 #
-# @router.<method>("/<resource_name>", response_model=<resource_schema>, status_code=<status_code>)
-# async def <function_name>(
-#     <param_name>: <request_schema>,
-#     session: AsyncSession = Depends(get_session),
-# ):
-#     """<docstring>"""
-#     return await <db_create_function>(session, name=<param_name>.name, email=<param_name>.email)
+@router.post("/learners", response_model=Learner, status_code=201)
+async def create_learner_route(
+    learner_data: LearnerCreate,
+    session: AsyncSession = Depends(get_session),
+):
+    """Create a new learner in the database."""
+    return await create_learner(session, name=learner_data.name, email=learner_data.email)
 #
 # Reference:
 # items POST -> creates a row in items table, accepts ItemCreate, returns Item with status 201
